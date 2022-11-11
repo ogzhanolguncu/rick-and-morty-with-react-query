@@ -22,21 +22,9 @@ export type Character = {
   created: string;
 };
 
-export type CharacterResponse = {
-  info: {
-    count: number;
-    pages: number;
-    next: string | null;
-    prev: string | null;
-  };
-  results: Character[];
-};
-
-export const fetchCharacter = async () => {
+export const fetchCharacter = async (charUrl: string) => {
   try {
-    const { data } = await axios.get<CharacterResponse>(
-      `${BASE_URL}/character`
-    );
+    const { data } = await axios.get<Character>(charUrl);
     return data;
   } catch (error) {
     console.error("Something went wrong!");
