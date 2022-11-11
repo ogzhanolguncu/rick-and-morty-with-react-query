@@ -1,26 +1,32 @@
 import { Grid, Center, Skeleton, Flex, Text, Box } from "@chakra-ui/react";
-import { useInfiniteQuery, useQuery } from "react-query";
+import { useInView } from "react-intersection-observer";
+import { useInfiniteQuery } from "react-query";
 import { fetchEpisodes } from "./api/fetchEpisodes";
 import { CharacterCard } from "./components/CharacterCard";
 
 function App() {
   const {
     data,
-    error,
     fetchNextPage,
     hasNextPage,
     isFetching,
     isFetchingNextPage,
-    status,
     isLoading,
   } = useInfiniteQuery({
     queryKey: ["projects"],
     queryFn: (context) => fetchEpisodes(context.pageParam),
-    getNextPageParam: (lastPage, pages) => {
+    getNextPageParam: (lastPage) => {
       return lastPage?.info.next;
     },
   });
-  // console.log(hasNextPage, data);
+
+  const { ref } = useInView({
+    threshold: 0.5,
+    onChange(inView) {
+      if (inView) hasNextPage && fetchNextPage();
+    },
+  });
+
   if (isLoading) {
     return (
       <Center mt="3rem">
@@ -72,16 +78,13 @@ function App() {
         ))
       )}
       <Flex color="#fff" mb="2rem">
-        <button
-          onClick={() => fetchNextPage()}
-          disabled={!hasNextPage || isFetchingNextPage}
-        >
+        <Text ref={ref}>
           {isFetchingNextPage
-            ? "Loading more..."
+            ? "Fetching more episodes"
             : hasNextPage
             ? "Load More"
             : "Nothing more to load"}
-        </button>
+        </Text>
         <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
       </Flex>
     </Center>
