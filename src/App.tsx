@@ -1,10 +1,13 @@
 import { Grid, Center, Skeleton, Flex, Text, Box } from "@chakra-ui/react";
+import { useCallback, useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { useInfiniteQuery } from "react-query";
 import { fetchEpisodes } from "./api/fetchEpisodes";
 import { CharacterCard } from "./components/CharacterCard";
 
 function App() {
+  const [number, setNumber] = useState(0);
+
   const {
     data,
     fetchNextPage,
@@ -19,6 +22,8 @@ function App() {
       return lastPage?.info.next;
     },
   });
+
+  const imACallback = (randomNumber: number) => setNumber(randomNumber);
 
   const { ref } = useInView({
     threshold: 0.5,
@@ -71,7 +76,11 @@ function App() {
               gap={6}
             >
               {episode.characters.slice(0, 6).map((charUrl) => (
-                <CharacterCard charUrl={charUrl} key={charUrl} />
+                <CharacterCard
+                  charUrl={charUrl}
+                  key={charUrl}
+                  imACallback={imACallback}
+                />
               ))}
             </Grid>
           </Flex>
